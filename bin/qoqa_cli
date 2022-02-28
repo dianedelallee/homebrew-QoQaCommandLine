@@ -1,0 +1,59 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+require 'net/http'
+require 'uri'
+require 'json'
+require 'rack'
+
+def parse_website_name(website_name:) = website_name == 'wwwqoqach' ? 'QoQa' : website_name.gsub("qoqach", "")
+
+def create_link_for_offer(offer_name:, website_name:)
+  link = website_name == 'QoQa' ? 'qoqa.ch' : "#{website_name}.qoqa.ch"
+
+  "\e]8;;http://#{link}\e\\#{offer_name}\e]8;;\e\\\n "
+end
+
+def get_qoqa_offer
+  uri = URI("https://api.qoqa.ch/v1/offers")
+
+  parsed_response = JSON.load(Net::HTTP.get_response(uri).body)
+
+  value = parsed_response['data']
+  value = [value] if value.is_a?(Hash)
+
+  value.each_with_index do |offer|
+    attributes = offer['attributes']
+    website_name = parse_website_name(website_name: attributes['website_identifier'])
+    qoqa_link = create_link_for_offer(offer_name: attributes['title'], website_name: website_name)
+    puts "\n\e[35mOffer #{website_name.capitalize}\e[0m: \e[34m#{qoqa_link}\e[0m #{attributes['subtitle']}: \e[32m#{attributes['monetized_lot_price']}\e[0m\n"
+  end
+end
+
+def get_parser
+  OptionParser.new do |parser|
+    parser.on("-o", "--offers", "Show all the QoQa offers")
+
+    parser.on("-h", "--help", "Help manual") do
+      puts parser
+      exit
+    end
+  end
+end
+
+def main
+  options = {}
+
+  parser = get_parser
+  parser.parse!(into: options)
+
+  if options.key?(:offers)
+    get_qoqa_offer
+  else
+    puts 'This options does not exist'
+    puts parser
+    exit
+  end
+end
+
+main
