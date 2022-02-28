@@ -30,9 +30,22 @@ def get_qoqa_offer
   end
 end
 
+def link_for_job_application(job_id:) = "\e]8;;https://qoqa.intranet.digital/external/fr/jobs/#{job_id}\e\\Apply 🦦\e]8;;\e\\"
+
+def get_qoqa_jobs
+  uri = URI("https://qoqa.intranet.digital/api/v1/external/recruitment/vacancies?accessRule=DIRECT_APPLICANTS&include=&page=1&perPage=9999")
+  parsed_response = JSON.load(Net::HTTP.get_response(uri).body)
+  value = parsed_response['data']
+  value = [value] if value.is_a?(Hash)
+  value.each_with_index do |job|
+    puts "\n\e[35m#{job['jobTitle']['title']}\e[0m \e[32m#{job['vacancyWorkRate']}%\e[0m (#{job['department']['name']}) \e[31m#{job['city']} (#{job['state']})\e[0m - \e[34m#{link_for_job_application(job_id: job['id'])}\e[0m\n"
+  end
+end
+
 def get_parser
   OptionParser.new do |parser|
     parser.on("-o", "--offers", "Show all the QoQa offers")
+    parser.on("-j", "--jobs", "Show all the QoQa jobs")
 
     parser.on("-h", "--help", "Help manual") do
       puts parser
@@ -49,6 +62,8 @@ def main
 
   if options.key?(:offers)
     get_qoqa_offer
+  elsif options.key?(:jobs)
+    get_qoqa_jobs
   else
     puts 'This options does not exist'
     puts parser
