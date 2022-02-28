@@ -5,7 +5,7 @@ A command line tool to get information about QoQa
 ## Install
 ```shell
 brew tap dianedelallee/QoQaCommandLine
-brew install QoQaCommandLine
+brew install qoqa_cli
 ```
 
 ## Use
