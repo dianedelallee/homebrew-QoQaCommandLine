@@ -1,4 +1,4 @@
-class QoQaCommandLine < Formula
+class QoqaCli < Formula
   desc ""
   homepage "https://github.com/dianedelallee/QoQaCommandLine"
   version "0.1"
