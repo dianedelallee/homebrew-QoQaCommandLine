@@ -5,6 +5,7 @@ class QoqaCli < Formula
 
   url "https://github.com/dianedelallee/homebrew-QoQaCommandLine/archive/refs/tags/v0.1.zip", :using => :curl
 
+    
   def install
     bin.install "bin/qoqa_cli"
   end
