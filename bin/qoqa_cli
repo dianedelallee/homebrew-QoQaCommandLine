@@ -15,18 +15,17 @@ def create_link_for_offer(offer_name:, website_name:)
 end
 
 def get_qoqa_offer
-  uri = URI("https://api.qoqa.ch/v1/offers")
+  uri = URI("https://api.qoqa.ch/v2/offers_mosaic")
 
   parsed_response = JSON.load(Net::HTTP.get_response(uri).body)
 
-  value = parsed_response['data']
+  value = parsed_response['offers']
   value = [value] if value.is_a?(Hash)
 
   value.each_with_index do |offer|
-    attributes = offer['attributes']
-    website_name = parse_website_name(website_name: attributes['website_identifier'])
-    qoqa_link = create_link_for_offer(offer_name: attributes['title'], website_name: website_name)
-    puts "\n\e[35mOffer #{website_name.capitalize}\e[0m: \e[34m#{qoqa_link}\e[0m #{attributes['subtitle']}: \e[32m#{attributes['monetized_lot_price']}\e[0m\n"
+    website_name = parse_website_name(website_name: offer['website_identifier'])
+    qoqa_link = create_link_for_offer(offer_name: offer['title'], website_name: website_name)
+    puts "\n\e[35mOffer #{website_name.capitalize}\e[0m: \e[34m#{qoqa_link}\e[0m #{offer['subtitle']}: \e[32m#{offer['offer_price_text']}\e[0m\n"
   end
 end
 
@@ -45,7 +44,7 @@ end
 def get_parser
   OptionParser.new do |parser|
     parser.on("-o", "--offers", "Show all the QoQa offers")
-    parser.on("-j", "--jobs", "Show all the QoQa jobs")
+    # parser.on("-j", "--jobs", "Show all the QoQa jobs")
 
     parser.on("-h", "--help", "Help manual") do
       puts parser
@@ -62,8 +61,6 @@ def main
 
   if options.key?(:offers)
     get_qoqa_offer
-  elsif options.key?(:jobs)
-    get_qoqa_jobs
   else
     puts 'This options does not exist'
     puts parser
