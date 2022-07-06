@@ -14,7 +14,7 @@ def create_link_for_offer(offer_name:, website_name:)
   "\e]8;;http://#{link}\e\\#{offer_name}\e]8;;\e\\"
 end
 
-def gauge_information(soldout:, gauge_step:) = soldout ? 'soldout' : "stock #{gauge_step}"
+def gauge_information(soldout:, gauge_step:, percent:) = soldout ? 'soldout' : "stock #{gauge_step} (#{percent}%)"
 
 def qoqa_offer
   uri = URI("https://api.qoqa.ch/v2/offers_mosaic")
@@ -27,7 +27,9 @@ def qoqa_offer
   value.each_with_index do |offer|
     website_name = parse_website_name(website_name: offer['website_identifier'])
     qoqa_link = create_link_for_offer(offer_name: offer['title'], website_name: website_name)
-    soldout_info = gauge_information(soldout: offer['soldout'], gauge_step: offer['gauge_step'])
+    soldout_info = gauge_information(
+      soldout: offer['soldout'], gauge_step: offer['gauge_step'], percent: offer['remaining_stock_percent']
+      )
     puts "\n\e[35mOffer #{website_name.capitalize}\e[0m: \e[34m#{qoqa_link} \e[33m#{soldout_info} \n\e[0m #{offer['subtitle']}: \e[32m#{offer['offer_price_text']}\e[0m\n"
   end
 end
