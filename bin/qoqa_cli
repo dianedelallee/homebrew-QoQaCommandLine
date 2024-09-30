@@ -6,43 +6,20 @@ require 'json'
 require 'rack'
 require 'Date'
 
-def parse_website_name(website_name:) = website_name == 'wwwqoqach' ? 'QoQa' : website_name.gsub("qoqach", "")
-
-def create_link_for_offer(offer_name:, website_name:)
-  link = website_name == 'QoQa' ? 'qoqa.ch' : "#{website_name}.qoqa.ch"
-
-  "\e]8;;http://#{link}\e\\#{offer_name}\e]8;;\e\\"
-end
-
-def gauge_information(soldout:, gauge_step:, percent:) = soldout ? 'soldout' : "stock #{gauge_step} (#{percent}%)"
+def create_link_for_offer(offer_name:, link:) = "\e]8;;http://#{link}\e\\#{offer_name}\e]8;;\e\\"
 
 def qoqa_offer
-  uri = URI("https://api.qoqa.ch/v2/offers_mosaic")
+  uri = URI("https://api.qoqa.ch/v2/universes")
 
   parsed_response = JSON.load(Net::HTTP.get_response(uri).body)
 
-  value = parsed_response['offers']
-  value = [value] if value.is_a?(Hash)
 
-  value.each_with_index do |offer|
-    website_name = parse_website_name(website_name: offer['website_identifier'])
-    qoqa_link = create_link_for_offer(offer_name: offer['title'], website_name: website_name)
-    soldout_info = gauge_information(
-      soldout: offer['soldout'], gauge_step: offer['gauge_step'], percent: offer['remaining_stock_percent']
-      )
-    puts "\n\e[35mOffer #{website_name.capitalize}\e[0m: \e[34m#{qoqa_link} \e[33m#{soldout_info} \n\e[0m #{offer['subtitle']}: \e[32m#{offer['offer_price_text']}\e[0m\n"
-  end
-end
-
-def link_for_job_application(job_id:) = "\e]8;;https://qoqa.intranet.digital/external/fr/jobs/#{job_id}\e\\Apply 🦦\e]8;;\e\\"
-
-def qoqa_jobs
-  uri = URI("https://qoqa.intranet.digital/api/v1/external/recruitment/vacancies?accessRule=DIRECT_APPLICANTS&include=&page=1&perPage=9999")
-  parsed_response = JSON.load(Net::HTTP.get_response(uri).body)
-  value = parsed_response['data']
-  value = [value] if value.is_a?(Hash)
-  value.each_with_index do |job|
-    puts "\n\e[35m#{job['jobTitle']['title']}\e[0m \e[32m#{job['vacancyWorkRate']}%\e[0m (#{job['department']['name']}) \e[31m#{job['city']} (#{job['state']})\e[0m - \e[34m#{link_for_job_application(job_id: job['id'])}\e[0m\n"
+  parsed_response.each_with_index do |universe|
+    universe['offers'].each_with_index do |offer|
+      universe_name = offer['universe_name']
+      qoqa_link = create_link_for_offer(offer_name: offer['title'], link: offer['url'])
+      puts "\n\e[35mOffer #{universe_name.capitalize}\e[0m: \e[34m#{qoqa_link} \e[33m#{offer['remaining_stock_percent'] % remaining} \n\e[0m #{offer['subtitle']}: \e[32m#{offer['offer_price_text']}\e[0m\n"
+    end
   end
 end
 
