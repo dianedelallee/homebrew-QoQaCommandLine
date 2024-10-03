@@ -6,7 +6,6 @@ require 'json'
 require 'rack'
 require 'Date'
 
-def create_link_for_offer(offer_name:, link:) = "\e]8;;http://#{link}\e\\#{offer_name}\e]8;;\e\\"
 
 def qoqa_offer
   uri = URI("https://api.qoqa.ch/v2/universes")
@@ -17,8 +16,7 @@ def qoqa_offer
   parsed_response.each_with_index do |universe|
     universe['offers'].each_with_index do |offer|
       universe_name = offer['universe_name']
-      qoqa_link = create_link_for_offer(offer_name: offer['title'], link: offer['url'])
-      puts "\n\e[35mOffer #{universe_name.capitalize}\e[0m: \e[34m#{qoqa_link} \e[33m#{offer['remaining_stock_percent']} % remaining \n\e[0m #{offer['subtitle']}: \e[32m#{offer['offer_price_text']}\e[0m\n"
+      puts "\n\e[35mOffer #{universe_name.capitalize}\e[0m: \e[34m#{offer['url']} \e[33m#{offer['remaining_stock_percent']} % remaining \n\e[0m #{offer['subtitle']}: \e[32m#{offer['offer_price_text']}\e[0m\n"
     end
   end
 end
