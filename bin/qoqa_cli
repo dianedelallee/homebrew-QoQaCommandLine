@@ -83,7 +83,7 @@ def main
 
   if options.key?(:offers)
     qoqa_offer
-  elsif options.key?(:blog_fr)
+  elsif options.key?(:thematics)
     qoqa_thematics
   elsif options.key?(:blog_fr)
     blog_post(nb_blog_post: nb_blog(param: options[:blog_fr]), locale: 'fr')
