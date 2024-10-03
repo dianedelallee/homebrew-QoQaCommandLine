@@ -23,6 +23,23 @@ def qoqa_offer
   end
 end
 
+def qoqa_thematics
+  uri = URI("https://api.qoqa.ch/v2/universes")
+
+  parsed_response = JSON.load(Net::HTTP.get_response(uri).body)
+
+  parsed_response.each_with_index do |universe|
+    universe['thematics'].each_with_index do |thematics|
+      thematics['offers'].each_with_index do |offer|
+        universe_name = offer['universe_name']
+        qoqa_link = create_link_for_offer(offer_name: offer['title'], link: offer['url'])
+        puts "\n\e[35mOffer #{universe_name.capitalize}\e[0m: \e[34m#{qoqa_link} \e[33m#{offer['remaining_stock_percent']} % remaining \n\e[0m #{offer['subtitle']}: \e[32m#{offer['offer_price_text']}\e[0m\n"
+      end
+    end
+  end
+end
+
+
 def link_for_blog_post(blog_post_name:, blog_post_url:)
   "\e]8;;#{blog_post_url}\e\\#{blog_post_name}\e]8;;\e\\"
 end
@@ -44,6 +61,7 @@ end
 def get_parser
   OptionParser.new do |parser|
     parser.on("-o", "--offers", "Show all the QoQa offers")
+    parser.on("-t", "--thematics", "Show all the QoQa offers in a thematic")
     parser.on("-f", "--blog_fr [NB_POST_FR]", "Show some QoQa blog posts in french")
     parser.on("-d", "--blog_de [NB_POST_DE]", "Show some QoQa blog posts in german")
     # parser.on("-j", "--jobs", "Show all the QoQa jobs")
@@ -65,6 +83,8 @@ def main
 
   if options.key?(:offers)
     qoqa_offer
+  elsif options.key?(:blog_fr)
+    qoqa_thematics
   elsif options.key?(:blog_fr)
     blog_post(nb_blog_post: nb_blog(param: options[:blog_fr]), locale: 'fr')
   elsif options.key?(:blog_de)
