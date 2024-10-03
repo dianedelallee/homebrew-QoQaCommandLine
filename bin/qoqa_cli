@@ -18,7 +18,7 @@ def qoqa_offer
     universe['offers'].each_with_index do |offer|
       universe_name = offer['universe_name']
       qoqa_link = create_link_for_offer(offer_name: offer['title'], link: offer['url'])
-      puts "\n\e[35mOffer #{universe_name.capitalize}\e[0m: \e[34m#{qoqa_link} \e[33m#{offer['remaining_stock_percent'] % remaining} \n\e[0m #{offer['subtitle']}: \e[32m#{offer['offer_price_text']}\e[0m\n"
+      puts "\n\e[35mOffer #{universe_name.capitalize}\e[0m: \e[34m#{qoqa_link} \e[33m#{offer['remaining_stock_percent']} % remaining \n\e[0m #{offer['subtitle']}: \e[32m#{offer['offer_price_text']}\e[0m\n"
     end
   end
 end
