@@ -29,6 +29,8 @@ def qoqa_thematics
   parsed_response = JSON.load(Net::HTTP.get_response(uri).body)
 
   parsed_response.each_with_index do |universe|
+    next if universe['thematics'].nil?
+
     universe['thematics'].each_with_index do |thematics|
       thematics['offers'].each_with_index do |offer|
         universe_name = offer['universe_name']
